@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Firmly Concept · Gaurav Basantani</title>
+<meta name="description" content="How a store could get ready for AI shoppers: what agents will be asked, a preview, then where to sell. An unofficial concept by Gaurav Basantani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: the product screen is the page. One merchant app window (steps rail | main step | "Ready to sell" panel), three labels, one proof strip. */
+:root{
+  --bg:#eef0f4; --window:#ffffff; --panel:#f6f7fa; --ink:#121826; --muted:#5b6475; --line:#e0e4eb;
+  --accent:#3550d4; --accent-ink:#ffffff; --accent-soft:#e8ecfc;
+  --ok:#14794b; --ok-soft:#dff3e8; --warn:#8a5a00; --warn-soft:#fdf0d5; --off:#9aa3b2;
+  --shadow:0 1px 2px rgba(18,24,38,.05),0 14px 34px rgba(18,24,38,.09);
+  --sans:"Inter",system-ui,-apple-system,sans-serif; --display:"Inter Tight","Inter",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c0f15; --window:#151a23; --panel:#11161e; --ink:#e7ebf2; --muted:#9aa3b3; --line:#283040;
+  --accent:#93a6ff; --accent-ink:#0c1230; --accent-soft:#1c2445;
+  --ok:#7fdcae; --ok-soft:#14301f; --warn:#f2c46b; --warn-soft:#382c11; --off:#5d6676; --shadow:none; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c0f15; --window:#151a23; --panel:#11161e; --ink:#e7ebf2; --muted:#9aa3b3; --line:#283040;
+  --accent:#93a6ff; --accent-ink:#0c1230; --accent-soft:#1c2445;
+  --ok:#7fdcae; --ok-soft:#14301f; --warn:#f2c46b; --warn-soft:#382c11; --off:#5d6676; --shadow:none; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:22px}
+p,h1,h2,h3{margin:0}
+.head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.eyebrow{font:500 .72rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1{font:800 clamp(1.6rem,3.4vw,2.3rem)/1.08 var(--display);letter-spacing:-.025em;margin-top:6px;text-wrap:balance}
+.sub{color:var(--muted);margin-top:6px;font-size:1rem}
+.by{font:500 .78rem var(--mono);color:var(--muted);text-align:right}
+.by a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+@media(max-width:600px){.by{text-align:left}}
+/* window */
+.window{background:var(--window);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--line)}
+.store{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.store b{color:var(--ink);font-weight:600}
+.logo{width:28px;height:28px;border-radius:8px;background:var(--ink);color:var(--window);display:grid;place-items:center;font:700 .8rem var(--display)}
+.steps{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px}
+.steps button{font:600 .8rem var(--sans);border:0;background:transparent;color:var(--muted);border-radius:7px;padding:6px 12px;cursor:pointer;min-height:32px;display:flex;gap:6px;align-items:center}
+.steps button[aria-current="step"]{background:var(--window);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.steps .tick{color:var(--ok)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 270px}
+@media(max-width:860px){.cols{grid-template-columns:1fr}.side{border-left:0!important;border-top:1px solid var(--line)}}
+.main{padding:22px;display:grid;gap:16px;align-content:start;min-width:0;min-height:430px}
+@media(max-width:860px){.main{min-height:0}}
+.title{display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap}
+.title h2{font:700 1.35rem/1.2 var(--display);letter-spacing:-.01em}
+.title p{color:var(--muted);font-size:.9rem;margin-top:3px}
+.pill{font:600 .74rem var(--sans);padding:5px 10px;border-radius:999px;white-space:nowrap}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.info{background:var(--accent-soft);color:var(--accent)}
+/* step 1: questions */
+.qs{display:grid;grid-template-columns:220px minmax(0,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+@media(max-width:620px){.qs{grid-template-columns:1fr}.qlist{border-right:0!important;border-bottom:1px solid var(--line)}}
+.qlist{border-right:1px solid var(--line);display:grid;align-content:start}
+.qlist button{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;border:0;border-top:1px solid var(--line);background:transparent;padding:10px 12px;cursor:pointer;color:var(--ink);font:inherit}
+.qlist button:first-child{border-top:0}
+.qlist button[aria-current="true"]{background:var(--accent-soft)}
+.qlist small{display:block;color:var(--muted);font-size:.76rem}
+.thumb{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line)}
+.thumb svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.6}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--warn)}.dot.ok{background:var(--ok)}
+.qdetail{padding:16px;display:grid;gap:12px;align-content:start;min-width:0}
+.ask{font:700 1.1rem/1.25 var(--display)}
+.askmeta{font-size:.84rem;color:var(--muted)}
+.draft{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.draft .dh{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);font:500 .72rem var(--mono);color:var(--muted)}
+.draft .dt{padding:12px;font-size:.95rem}
+.draft textarea{width:100%;border:0;padding:12px;font:inherit;font-size:.95rem;background:var(--window);color:var(--ink);resize:vertical;min-height:70px}
+.src{font-size:.82rem;color:var(--muted);display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start}
+.src mark{background:var(--warn-soft);color:var(--ink);padding:0 3px;border-radius:3px}
+.src .k{font:500 .68rem var(--mono);letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:600 .88rem var(--sans);border-radius:9px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:var(--window);color:var(--ink);min-height:40px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn:focus-visible,.steps button:focus-visible,.qlist button:focus-visible,.tab:focus-visible,.sw:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.done{display:grid;gap:8px;place-items:start;padding:6px 0}
+.done b{font:700 1.05rem var(--display)}
+.more{font-size:.84rem;color:var(--muted)}
+/* step 2: preview */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:600 .84rem var(--sans);border:0;background:transparent;color:var(--muted);padding:8px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;place-items:center}
+.phone{width:100%;max-width:340px;background:var(--window);border:1px solid var(--line);border-radius:22px;padding:14px;display:grid;gap:10px;box-shadow:var(--shadow)}
+.ph{display:flex;justify-content:space-between;font:600 .74rem var(--sans);color:var(--muted)}
+.bub{border-radius:14px;padding:9px 12px;font-size:.88rem;max-width:88%}
+.bub.me{background:var(--accent);color:var(--accent-ink);justify-self:end}
+.bub.ai{background:var(--panel);border:1px solid var(--line)}
+.card{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center}
+@media(max-width:520px){.card{grid-template-columns:44px minmax(0,1fr)}.card .thumb{width:44px;height:44px}.card .buy{grid-column:2;justify-self:start}}
+.card .thumb{width:52px;height:52px}.card .thumb svg{width:30px;height:30px}
+.card b{display:block;font-size:.9rem}.card small{color:var(--muted);font-size:.78rem}
+.ans{font-size:.8rem;background:var(--ok-soft);color:var(--ok);border-radius:6px;padding:2px 7px;display:inline-block;margin-top:4px}
+.ans.miss{background:var(--warn-soft);color:var(--warn)}
+.buy{font:700 .82rem var(--sans);background:var(--ink);color:var(--window);border:0;border-radius:8px;padding:7px 12px}
+.sheet{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px;font-size:.84rem}
+.sheet .row{display:flex;justify-content:space-between;gap:8px}
+.sheet .sold{font-weight:600}
+.article{width:100%;max-width:420px;background:var(--window);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px}
+.article h3{font:700 1.05rem/1.25 var(--display)}
+.article p{font-size:.88rem;color:var(--muted)}
+.callout{font-size:.84rem;color:var(--muted);display:flex;gap:8px;align-items:start}
+.callout b{color:var(--ink)}
+/* step 3: channels */
+.channels{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ch{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.ch:first-child{border-top:0}
+.ch b{display:block;font-weight:600}.ch small{color:var(--muted);font-size:.8rem}
+.sw{width:44px;height:26px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--window);box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+.sw[aria-checked="true"]{background:var(--accent)}.sw[aria-checked="true"]::after{left:21px}
+.rule{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;font-size:.9rem}
+.rule .hint{grid-column:1/-1}
+@media(max-width:520px){.rule{grid-template-columns:1fr}}
+select{font:inherit;font-size:.88rem;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--window);color:var(--ink)}
+.stay{background:var(--ok-soft);border-radius:10px;padding:12px 14px;font-size:.9rem;display:grid;gap:2px}
+.stay b{color:var(--ok)}
+.live{border:1px solid var(--ok);background:var(--ok-soft);border-radius:12px;padding:16px;display:grid;gap:8px}
+.live h3{font:700 1.15rem var(--display);color:var(--ok)}
+.sum{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sum div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;padding:10px 14px;border-top:1px solid var(--line);font-size:.9rem}
+.sum div:first-child{border-top:0}
+.sum .k{color:var(--muted);font-size:.82rem}
+.linkbtn{font:600 .9rem var(--sans);border:0;background:none;color:var(--accent);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.linkbtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.nudge{font-size:.86rem;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:8px 12px}
+/* side */
+.side{background:var(--panel);border-left:1px solid var(--line);padding:20px;display:grid;gap:12px;align-content:start}
+.cap{font:500 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.score{display:flex;align-items:baseline;gap:6px}
+.score strong{font:800 2rem/1 var(--display);font-variant-numeric:tabular-nums}
+.score span{color:var(--muted);font-size:.86rem}
+.meter{height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.checks{display:grid}
+.checks div{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:.86rem}
+.checks div:first-child{border-top:0}
+.checks i{width:9px;height:9px;border-radius:50%;margin-top:5px;background:var(--off)}
+.checks i.ok{background:var(--ok)}.checks i.warn{background:var(--warn)}
+.checks b{display:block;font-weight:600}.checks span span{color:var(--muted)}
+.hint{font-size:.8rem;color:var(--muted)}
+/* labels + proof */
+.labels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:720px){.labels{grid-template-columns:1fr}}
+.label{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
+.n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--window);font:600 .78rem var(--mono);display:grid;place-items:center}
+.label b{display:block;font-size:.98rem}.label div span{color:var(--muted);font-size:.88rem}
+.proof{background:var(--window);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:18px;align-items:center}
+@media(max-width:720px){.proof{grid-template-columns:1fr}}
+.proof b{font-size:.98rem}.proof p{color:var(--muted);font-size:.88rem;margin-top:3px}
+.proof a{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
+.stat strong{display:block;font:800 1.3rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stat span{font-size:.74rem;color:var(--muted);line-height:1.25;display:block;margin-top:4px}
+@media(max-width:480px){.stats{grid-template-columns:1fr}.stat{display:grid;grid-template-columns:80px minmax(0,1fr);gap:10px;align-items:center}.stat span{margin-top:0}}
+footer{color:var(--muted);font-size:.76rem}
+@media(prefers-reduced-motion:no-preference){.main>*{animation:in .2s ease-out both}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+@media(prefers-reduced-motion:reduce){.sw::after,.meter i{transition:none}}
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <div class="eyebrow">Design concept · Merchant setup</div>
+      <h1>Get a store ready for AI shoppers</h1>
+      <p class="sub">See what agents will be asked, preview it, then choose where to sell.</p>
+    </div>
+    <div class="by">Gaurav Basantani<br><a href="https://gauravbasantani.com">gauravbasantani.com</a></div>
+  </header>
+
+  <section class="window" aria-label="Merchant setup screen concept">
+    <div class="bar">
+      <span class="store"><span class="logo" aria-hidden="true">N</span><span><b>Northline Goods</b> · Shopify · 1,284 products</span></span>
+      <nav class="steps" aria-label="Setup steps">
+        <button type="button" data-go="1" id="s1"><span>1 Check</span></button>
+        <button type="button" data-go="2" id="s2"><span>2 Preview</span></button>
+        <button type="button" data-go="3" id="s3"><span>3 Go live</span></button>
+      </nav>
+    </div>
+    <div class="cols">
+      <div class="main" id="main" aria-live="polite"></div>
+      <aside class="side" aria-label="Ready to sell">
+        <span class="cap">Ready to sell</span>
+        <div class="score"><strong id="pct">37</strong><span id="pcts">answers missing</span></div>
+        <div class="meter"><i id="bar"></i></div>
+        <div class="checks" id="checks"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="labels" aria-label="Design decisions">
+    <div class="label"><span class="n">1</span><div><b>Shows what agents get asked</b><span>Gaps first, with a draft from your own page.</span></div></div>
+    <div class="label"><span class="n">2</span><div><b>Preview before it's live</b><span>See the product inside an assistant and an article.</span></div></div>
+    <div class="label"><span class="n">3</span><div><b>You stay in control</b><span>Pick channels and products. Pause any time.</span></div></div>
+  </section>
+
+  <section class="proof" aria-label="Where this comes from">
+    <div>
+      <b>I've designed checkout and AI people can check.</b>
+      <p>A checkout redesign, workflows for a financial platform, and <a href="https://gauravide.vercel.app">Gauravide</a>, where every line the AI isn't sure of gets checked.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><strong>+30%</strong><span>purchase completion after a checkout redesign</span></div>
+      <div class="stat"><strong>30+</strong><span>screens for customers and admins on a financial platform</span></div>
+      <div class="stat"><strong>0 of 67</strong><span>receipts left unreadable in Gauravide</span></div>
+    </div>
+  </section>
+
+  <footer>Unofficial concept for firmly. Not affiliated with firmly. The store, products and numbers are made up.</footer>
+</div>
+
+<script>
+(function(){
+  var TOTAL=1284, START_MISSING=37;
+  var ICON={
+    bag:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.2 11H5.2z"/><path d="M8.5 9V7a3.5 3.5 0 0 1 7 0v2"/></svg>',
+    boot:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h5v9l7 3v5H5V15z"/><path d="M5 17h14"/></svg>',
+    coat:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l5 4-2 4-2-1v11H8V10l-2 1-2-4z"/><path d="M12 3v18"/></svg>'
+  };
+  var Q=[
+    {id:"bag",name:"Leather holdall",price:"$142.50",ask:"Will it fit in a plane's overhead bin?",asked:"Shoppers ask agents this about travel bags",
+     draft:"Yes. At 20 × 12 × 9 in, it fits the overhead bin on most US airlines.",src:'Your product page: "Dimensions: <mark>20 x 12 x 9 in</mark>, 2.4 lb"'},
+    {id:"boot",name:"Waxed hiking boot",price:"$189.00",ask:"Do these run true to size?",asked:"Shoppers ask agents this about footwear",
+     draft:"Mostly yes. Reviews say they run slightly narrow, so wide feet may want a half size up.",src:'Your reviews: "<mark>runs a little narrow</mark>, went half size up" (14 reviews)'},
+    {id:"coat",name:"Canvas chore coat",price:"$118.00",ask:"Can I machine wash it?",asked:"Shoppers ask agents this about outerwear",
+     draft:"Yes, cold and gentle. Hang to dry so the canvas keeps its shape.",src:'Your care label text: "<mark>Machine wash cold, gentle</mark>. Hang dry."'}
+  ];
+  function fresh(){return {step:1,sel:0,res:{},edit:null,text:{},tab:"assistant",seen:{assistant:false,article:false},ch:{assistant:true,article:true,market:false,ads:false},scope:"all",live:false}}
+  var st=fresh();
+  var main=document.getElementById("main"), checks=document.getElementById("checks");
+  function e(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function fixed(){return Object.keys(st.res).filter(function(k){return st.res[k]==="ok"}).length}
+  function missing(){return START_MISSING-fixed()}
+  function pct(){return Math.floor((TOTAL-missing())/TOTAL*1000)/10}
+  function nOn(){return Object.keys(st.ch).filter(function(k){return st.ch[k]}).length}
+  function step1(){
+    var q=Q[st.sel], r=st.res[q.id], h="";
+    h+='<div class="title"><div><h2>What will agents be asked?</h2><p>'+missing()+' products are missing an answer shoppers often ask for.</p></div><span class="pill '+(missing()<START_MISSING?"info":"warn")+'">'+missing()+' to answer</span></div>';
+    h+='<div class="qs"><div class="qlist" role="list">'+Q.map(function(x,i){var d=st.res[x.id];
+      return '<button type="button" role="listitem" data-sel="'+i+'"'+(i===st.sel?' aria-current="true"':'')+'><span class="thumb">'+ICON[x.id]+'</span><span>'+e(x.name)+'<small>'+(d==="ok"?"Answered":d==="skip"?"Skipped":"Needs an answer")+'</small></span><i class="dot'+(d==="ok"?" ok":"")+'" aria-hidden="true"></i></button>'}).join("")+'</div>';
+    h+='<div class="qdetail">';
+    if(r==="ok"){
+      h+='<div class="done"><span class="pill ok">Approved</span><b>'+e(q.name)+'</b><p>Agents will now answer: "'+e(st.text[q.id]||q.draft)+'"</p><div class="btns"><button type="button" class="btn" data-undo="'+q.id+'">Edit answer</button>'+(nextOpen()!==null?'<button type="button" class="btn primary" data-sel="'+nextOpen()+'">Next product</button>':'<button type="button" class="btn primary" data-go="2">Preview</button>')+'</div></div>';
+    }else{
+      h+='<span class="askmeta">'+e(q.asked)+'</span><div class="ask">"'+e(q.ask)+'"</div>';
+      h+='<div class="draft"><div class="dh"><span>'+(st.edit===q.id?"Your answer":"Draft answer")+'</span><span>'+e(q.name)+'</span></div>'+
+        (st.edit===q.id?'<label for="ed" class="hint" style="padding:8px 12px 0;display:block">Edit before approving</label><textarea id="ed">'+e(st.text[q.id]||q.draft)+'</textarea>':'<div class="dt">'+e(st.text[q.id]||q.draft)+'</div>')+'</div>';
+      h+='<div class="src"><span class="k">From</span><span>'+q.src+'</span></div>';
+      h+='<div class="btns"><button type="button" class="btn primary" data-ok="'+q.id+'">Approve</button>'+(st.edit===q.id?'':'<button type="button" class="btn" data-edit="'+q.id+'">Edit</button>')+'<button type="button" class="btn ghost" data-skip="'+q.id+'">Skip for now</button></div>';
+      if(r==="skip")h+='<p class="more">Skipped. Agents will say they don\'t know, and offer your store\'s help page.</p>';
+    }
+    h+='</div></div>';
+    h+='<p class="more">Showing 3 of '+START_MISSING+'. Similar products can share one answer.</p>';
+    return h;
+  }
+  function nextOpen(){for(var i=0;i<Q.length;i++){if(!st.res[Q[i].id])return i}return null}
+  function step2(){
+    var a=st.res.bag==="ok", ans=st.text.bag||Q[0].draft, h="";
+    h+='<div class="title"><div><h2>Preview what shoppers see</h2><p>Live price and stock from your store. You stay the seller.</p></div><span class="pill info">Preview only</span></div>';
+    h+='<div class="tabs" role="tablist"><button type="button" class="tab" role="tab" data-tab="assistant" aria-selected="'+(st.tab==="assistant")+'">AI assistant</button><button type="button" class="tab" role="tab" data-tab="article" aria-selected="'+(st.tab==="article")+'">Article</button></div>';
+    h+='<div class="stage">';
+    if(st.tab==="assistant"){
+      h+='<div class="phone" aria-label="Assistant preview"><div class="ph"><span>Assistant</span><span>9:41</span></div>'+
+        '<div class="bub me">A weekend bag under $200 that fits in the overhead bin</div>'+
+        '<div class="bub ai">'+(a?'This one fits the overhead bin, and arrives Thursday:':'This one might work, and arrives Thursday:')+'</div>'+
+        '<div class="card"><span class="thumb">'+ICON.bag+'</span><span><b>Leather holdall</b><small>Northline Goods · $142.50</small><br><span class="ans'+(a?"":" miss")+'">'+(a?"Fits overhead bins":"Can't confirm it fits")+'</span></span><span class="buy">Buy</span></div>'+
+        '<div class="sheet"><div class="row"><span class="sold">Sold by Northline Goods</span><span>$142.50</span></div><div class="row"><span>Shipping</span><span>Free, arrives Thu</span></div><div class="row"><span>Stock</span><span>14 left</span></div></div></div>';
+    }else{
+      h+='<div class="article" aria-label="Article preview"><span class="pill info" style="justify-self:start">Travel · Gear</span><h3>Five bags that make a carry-on-only weekend easy</h3><p>We packed each one for three days and walked it through two airports.</p>'+
+        '<div class="card"><span class="thumb">'+ICON.bag+'</span><span><b>Leather holdall</b><small>Northline Goods · $142.50</small><br><span class="ans'+(a?"":" miss")+'">'+(a?"Fits overhead bins":"Can't confirm it fits")+'</span></span><span class="buy">Buy</span></div></div>';
+    }
+    h+='</div>';
+    h+='<div class="callout">'+(a?'<span><b>From your answer:</b> "'+e(ans)+'"</span>':'<span><b>Missing answer.</b> Approve the holdall answer in step 1 so agents can say it fits.</span>')+'</div>';
+    h+='<div class="btns">'+(a?'':'<button type="button" class="btn" data-go="1" data-sel0="1">Answer it</button>')+'<button type="button" class="btn primary" data-go="3">Choose where to sell</button></div>';
+    return h;
+  }
+  function step3(){
+    var h="";
+    if(st.live){
+      h+='<div class="title"><div><h2>You\'re live</h2><p>Selling in '+nOn()+' channel'+(nOn()===1?"":"s")+'.</p></div><span class="pill ok">Live</span></div>';
+      var names={assistant:"AI assistants",article:"Articles",market:"Marketplaces",ads:"Shoppable ads"};
+      var on=Object.keys(st.ch).filter(function(k){return st.ch[k]}).map(function(k){return names[k]}).join(", ");
+      var sc={all:"All 1,284 products",ready:(TOTAL-missing()).toLocaleString()+" products with answers",travel:"Travel collection (86)"}[st.scope];
+      h+='<div class="live"><h3>Orders arrive in Shopify as usual</h3><p>Your payments, customers and data stay yours. firmly runs the checkout in each channel.</p></div>';
+      h+='<div class="sum"><div><span class="k">Selling in</span><span>'+on+'</span></div><div><span class="k">Products</span><span>'+sc+'</span></div><div><span class="k">Still to answer</span><span>'+(missing()?missing()+' products. <button type="button" class="linkbtn" data-go="1">Answer them</button>':'None')+'</span></div></div>';
+      h+='<div class="btns"><button type="button" class="btn" data-pause="1">Pause all channels</button><button type="button" class="btn ghost" data-reset="1">Start over</button></div>';
+      return h;
+    }
+    h+='<div class="title"><div><h2>Choose where to sell</h2><p>Turn channels on or off any time.</p></div><span class="pill info">'+nOn()+' on</span></div>';
+    var C=[["assistant","AI assistants","Shoppers ask an assistant and buy in the chat"],["article","Articles","Buy buttons inside reviews and guides"],["market","Marketplaces","Listed next to other brands, one cart"],["ads","Shoppable ads","Buy straight from an ad"]];
+    h+='<div class="channels">'+C.map(function(c){return '<div class="ch"><span><b>'+c[1]+'</b><small>'+c[2]+'</small></span><button type="button" class="sw" role="switch" aria-checked="'+st.ch[c[0]]+'" aria-label="'+c[1]+'" data-ch="'+c[0]+'"></button></div>'}).join("")+'</div>';
+    h+='<div class="rule"><label for="scope">Which products</label><select id="scope"><option value="all"'+(st.scope==="all"?" selected":"")+'>All 1,284 products</option><option value="ready"'+(st.scope==="ready"?" selected":"")+'>Only products with answers</option><option value="travel"'+(st.scope==="travel"?" selected":"")+'>Travel collection (86)</option></select>'+(st.scope==="ready"?'<span class="hint">'+(TOTAL-missing()).toLocaleString()+' products go live. The '+missing()+' without answers wait until you answer them.</span>':missing()?'<span class="hint">'+missing()+' products without answers will tell shoppers "I don\'t know" and link your help page.</span>':'')+'</div>';
+    if(!(st.seen.assistant&&st.seen.article))h+='<p class="nudge">You haven\'t seen the preview yet. <button type="button" class="linkbtn" data-go="2">Preview first</button></p>';
+    h+='<div class="stay"><b>You stay the seller</b><span>Orders, payments and customer data go through your Shopify as usual.</span></div>';
+    h+='<div class="btns"><button type="button" class="btn primary" data-golive="1"'+(nOn()?"":" disabled")+'>'+(nOn()?"Go live in "+nOn()+" channel"+(nOn()===1?"":"s"):"Turn on a channel")+'</button></div>';
+    return h;
+  }
+  function side(){
+    var m=missing();
+    document.getElementById("pct").textContent=m;
+    document.getElementById("pcts").textContent=m===1?"answer missing":"answers missing";
+    document.getElementById("bar").style.width=((START_MISSING-m)/START_MISSING*100)+"%";
+    function row(c,t,s){return '<div><i class="'+c+'"></i><span><b>'+t+'</b><span>'+s+'</span></span></div>'}
+    checks.innerHTML=
+      row("ok","Store connected","Shopify · no code")+
+      row("ok","Live price and stock","Synced from your store")+
+      row(m?"warn":"ok","Product answers",m?m+" missing":"All answered")+
+      row(st.seen.assistant&&st.seen.article?"ok":(st.seen.assistant||st.seen.article)?"warn":"","Preview",st.seen.assistant&&st.seen.article?"Assistant and article seen":(st.seen.assistant||st.seen.article)?"1 of 2 seen":"Not yet")+
+      row(st.live?"ok":st.step===3?"warn":"","Channels",st.live?nOn()+" live":st.step===3?nOn()+" chosen, not live yet":"Pick in step 3")+
+      row("ok","You stay the seller","Orders go to your Shopify");
+  }
+  function render(){
+    if(st.step===2)st.seen[st.tab]=true;
+    var dn=[nextOpen()===null, st.seen.assistant&&st.seen.article, st.live], L=["Check","Preview","Go live"];
+    ["s1","s2","s3"].forEach(function(id,i){var b=document.getElementById(id); if(i+1===st.step)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");
+      b.innerHTML=(dn[i]?'<span class="tick" aria-hidden="true">✓</span>':'<span>'+(i+1)+'</span>')+'<span>'+L[i]+'</span>'+(dn[i]?'<span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (done)</span>':'')});
+    main.innerHTML=st.step===1?step1():st.step===2?step2():step3();
+    side();
+    var ed=document.getElementById("ed"); if(ed){ed.addEventListener("input",function(){st.text[Q[st.sel].id]=ed.value}); ed.focus()}
+    var sc=document.getElementById("scope"); if(sc)sc.addEventListener("change",function(){st.scope=sc.value; render(); var n=document.getElementById("scope"); if(n)n.focus()});
+  }
+  document.addEventListener("click",function(ev){
+    var t=ev.target.closest("button"); if(!t||t.disabled)return;
+    var d=t.dataset;
+    if(d.go){st.step=+d.go; if(d.sel0)st.sel=0; st.edit=null}
+    if(d.sel!==undefined){st.sel=+d.sel; st.edit=null}
+    if(d.ok){st.res[d.ok]="ok"; st.edit=null}
+    if(d.edit){st.edit=d.edit}
+    if(d.skip){st.res[d.skip]="skip"; st.edit=null; var n=nextOpen(); if(n!==null)st.sel=n}
+    if(d.undo){delete st.res[d.undo]; st.edit=d.undo}
+    if(d.tab){st.tab=d.tab}
+    if(d.ch){st.ch[d.ch]=!st.ch[d.ch]}
+    if(d.golive){st.live=true}
+    if(d.pause){st.live=false; Object.keys(st.ch).forEach(function(k){st.ch[k]=false})}
+    if(d.reset){st=fresh()}
+    render();
+  });
+  render();
+})();
+</script>
+
+</body>
+</html>
